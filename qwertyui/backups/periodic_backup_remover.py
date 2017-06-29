@@ -4,22 +4,50 @@ import re
 
 
 class PeriodicBackupRemover:
+    """
+    Use this to remove backups based on intervals. For example you can have the following rules:
+
+    backup_rules = [
+        {
+            'upto': (3, 'day'),
+            'interval': (2, 'hour'),
+        },
+        {
+            'upto': (1, 'month'),
+            'interval': (1, 'day'),
+        },
+        {
+            'upto': (1, 'year'),
+            'interval': (1, 'week'),
+        },
+    ]
+
+    This means that: backups up to 3 days are store with intervals at least 2 hours,
+    backups older than 3 days but more recent than 1 month ago are stored in at least
+    1 day intervals while backups older than 1 month and more recent than 1 year are
+    stored in at least 1 week intervals. Backups older than 1 year will be discarded.
+
+    And then you can initialize remover like this:
+
+    remover = PeriodicBackupRemover()
+    remover.add_rules(backup_rules)
+
+    Remover also accepts a file name format.
+
+    By default backups are in the format:
+
+    backup-my.host.name-my-db-name-20170629-120000.zip
+
+    We need both host name and db name to differentiate between various hosts and their dbs.
+    Each (host, db) pair is treated as 1 group of backups to operate on.
+    """
+
     def __init__(self,
                  backup_file_name_re=r'backup-(.*)-(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2}).zip',
                  host_db_re=r'(.+\..+\.\w+)-(.+)'):
         self.rules = []
         self.backup_file_name_re = re.compile(backup_file_name_re)
         self.host_db_re = re.compile(host_db_re)
-
-    @staticmethod
-    def convert_size(size_bytes):
-        if size_bytes == 0:
-            return '0B'
-        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-        i = int(math.floor(math.log(size_bytes, 1024)))
-        p = math.pow(1024, i)
-        s = round(size_bytes/p, 2)
-        return '%s %s' % (s, size_name[i])
 
     @staticmethod
     def parse_date_format(num, unit):
@@ -98,6 +126,19 @@ class PeriodicBackupRemover:
                 return False
 
         return True
+
+    def add_rules(self, rules):
+        for rule in rules:
+            if isinstance(rule, dict):
+                self.add_rule(
+                    rule['upto'],
+                    rule['interval']
+                )
+            else:
+                self.add_rule(
+                    rule[0],
+                    rule[1]
+                )
 
     def add_rule(self, upto, interval):
         self.rules.append({
