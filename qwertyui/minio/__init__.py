@@ -1,7 +1,12 @@
 import minio
 import io
 import os
-import urllib
+import sys
+
+if sys.version_info < (3, 0):
+    from urlparse import urlparse
+else:
+    from urllib.parse import urlparse
 
 
 def get_minio_client(url, access_key, secret_key, region='eu-central-1', bucket=None):
@@ -10,7 +15,7 @@ def get_minio_client(url, access_key, secret_key, region='eu-central-1', bucket=
     Can optionally generate a bucket if parameter is provided.
     """
 
-    parsed = urllib.parse.urlparse(url)
+    parsed = urlparse(url)
     secure = parsed.scheme == 'https'
 
     mc = minio.Minio(
