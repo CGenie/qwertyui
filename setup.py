@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import find_packages, setup
 
 setup(name='qwertyui',
       version='1.0',
@@ -8,5 +8,5 @@ setup(name='qwertyui',
       author='Przemyslaw Kaminski',
       author_email='cgenie@gmail.com',
       url='https://github.com/CGenie/qwertyui',
-      packages=['qwertyui'],
+      packages=find_packages(exclude=['tests.py'])
 )

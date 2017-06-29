@@ -4,7 +4,7 @@ import unittest
 
 class PeriodicBackupRemoverTest(unittest.TestCase):
     def setUp(self):
-        from periodic_backup_remover import PeriodicBackupRemover
+        from .periodic_backup_remover import PeriodicBackupRemover
 
         BACKUP_RULES = [
             {
