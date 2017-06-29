@@ -28,26 +28,26 @@ class PeriodicBackupRemoverTest(unittest.TestCase):
 
     def test_rules(self):
         file_names = [
-            'backup-test-odoo.tameson.nl-tameson-base-20170114-060653.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170115-064242.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170116-072720.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170116-140950.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170117-144503.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170118-150440.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170119-152427.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170120-154418.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170121-160328.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170122-162216.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170123-164124.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170124-170108.zip',
-            'backup-odoo.de7deugden.nl-base-20170114-060655.zip',
-            'backup-portal.tameson.com-Tameson-20170201-115109.zip',
-            'backup-portal.tameson.com-Tameson-20170201-205858.zip',
-            'backup-test-odoo.tameson.nl-tameson-base-20170122-162216.zip',
-            'backup-portal.tameson.com-Tameson-20170202-171612.zip',
-            'backup-portal.tameson.com-Tameson-20170202-050529.zip',
-            'backup-portal.tameson.com-Tameson-20170130-055307.zip',
-            'backup-portal.tameson.com-Tameson-20170131-213921.zip',
+            'backup-host1.example.com-db1-20170114-060653.zip',
+            'backup-host1.example.com-db1-20170115-064242.zip',
+            'backup-host1.example.com-db1-20170116-072720.zip',
+            'backup-host1.example.com-db1-20170116-140950.zip',
+            'backup-host1.example.com-db1-20170117-144503.zip',
+            'backup-host1.example.com-db1-20170118-150440.zip',
+            'backup-host1.example.com-db1-20170119-152427.zip',
+            'backup-host1.example.com-db1-20170120-154418.zip',
+            'backup-host1.example.com-db1-20170121-160328.zip',
+            'backup-host1.example.com-db1-20170122-162216.zip',
+            'backup-host1.example.com-db1-20170123-164124.zip',
+            'backup-host1.example.com-db1-20170124-170108.zip',
+            'backup-host2.example.com-db1-20170114-060655.zip',
+            'backup-host1.example.com-db2-20170201-115109.zip',
+            'backup-host1.example.com-db2-20170201-205858.zip',
+            'backup-host1.example.com-db1-20170122-162216.zip',
+            'backup-host1.example.com-db2-20170202-171612.zip',
+            'backup-host1.example.com-db2-20170202-050529.zip',
+            'backup-host1.example.com-db2-20170130-055307.zip',
+            'backup-host1.example.com-db2-20170131-213921.zip',
         ]
 
         for file_name in file_names:
@@ -57,8 +57,8 @@ class PeriodicBackupRemoverTest(unittest.TestCase):
             self.remover.parse_backup_file_name(file_names[0]),
             {
                 'date': datetime.datetime(2017, 1, 14, 6, 6, 53),
-                'db': 'tameson-base',
-                'host': 'test-odoo.tameson.nl',
+                'db': 'db1',
+                'host': 'host1.example.com',
                 'file_name': file_names[0],
             }
         )
