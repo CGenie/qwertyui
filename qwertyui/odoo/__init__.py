@@ -6,6 +6,24 @@ import tempfile
 from qwertyui import urlparse
 
 
+def get_odoo_version(host):
+    r = requests.post(
+        '{}/jsonrpc'.format(host),
+        headers={'Content-Type': 'application/json'},
+        json={
+            'jsonrpc': '2.0',
+            'id': 1,
+            'method': 'call',
+            'params': {
+                'method': 'server_version',
+                'service': 'db',
+                'args': {}
+            }
+        }
+    )
+    return r.json()['result']
+
+
 def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', chunk_size=16384):
     """
     Downloads a full backup of an ODOO database and all data files.
