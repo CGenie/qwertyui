@@ -106,3 +106,25 @@ def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', 
             size += len(chunk)
 
     return file_path, size
+
+
+def download_all_backups(host, master_pwd, backup_dir=None, **kwargs):
+    """
+    Similar to download_backup above but downloads backups of all dbs for the specified ODOO host.
+    """
+
+    if not backup_dir:
+        backup_dir = tempfile.mkdtemp()
+
+    backups = {}
+
+    for db in list_dbs(host):
+        backups[db] = download_backup(
+            host,
+            db,
+            master_pwd,
+            backup_dir=backup_dir,
+            **kwargs
+        )
+
+    return backups
