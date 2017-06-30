@@ -33,9 +33,14 @@ def get_minio_client(url, access_key, secret_key, region='eu-central-1', bucket=
 
 
 def upload_file(client, bucket, file_path, minio_directory, content_type=None, metadata=None):
+    """
+    Uploads single file to minio.
+    """
+
     size = os.stat(file_path).st_size
     file_name = os.path.split(file_path)[1]
-    minio_file_path = '/'.join(minio_directory, file_name)
+    # TODO: can be problematic on Windows but well... I'm too lazy for this
+    minio_file_path = os.path.join(minio_directory, file_name)
 
     with io.open(file_path, 'rb') as f:
         client.put_object(
@@ -46,6 +51,25 @@ def upload_file(client, bucket, file_path, minio_directory, content_type=None, m
             content_type=content_type or 'application/octet-stream',
             metadata=metadata
         )
+
+
+def upload_directory(client, bucket, directory_path, minio_directory):
+    """
+    Uploads whole directory structure to minio (recursively).
+    """
+
+    for directory, directories, files in os.walk(directory_path):
+        # TODO: can be problematic on Windows but well... I'm too lazy for this
+        d = directory.replace(directory_path, '').lstrip(os.path.sep)
+        destination_directory = os.path.join(minio_directory, d)
+
+        for filename in files:
+            upload_file(
+                client,
+                bucket,
+                os.path.join(directory, filename),
+                destination_directory
+            )
 
 
 def size(client, bucket, file_path):
