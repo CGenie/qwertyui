@@ -24,6 +24,44 @@ def get_odoo_version(host):
     return r.json()['result']
 
 
+def get_server_version(host):
+    r = requests.post(
+        '{}/jsonrpc'.format(host),
+        headers={'Content-Type': 'application/json'},
+        json={
+            'jsonrpc': '2.0',
+            'id': 1,
+            'method': 'call',
+            'params': {
+                'method': 'server_version',
+                'service': 'db',
+                'args': {}
+            }
+        }
+    )
+
+    return r.json()['result']
+
+
+def list_dbs(host):
+    r = requests.post(
+        '{}/jsonrpc'.format(host),
+        headers={'Content-Type': 'application/json'},
+        json={
+            'jsonrpc': '2.0',
+            'id': 1,
+            'method': 'call',
+            'params': {
+                'method': 'list',
+                'service': 'db',
+                'args': {}
+            }
+        }
+    )
+
+    return r.json()['result']
+
+
 def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', chunk_size=16384):
     """
     Downloads a full backup of an ODOO database and all data files.
@@ -38,12 +76,12 @@ def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', 
     session = requests.Session()
 
     session.get(
-        '%s/web' % host,
+        '{}/web'.format(host),
         params={'db': db},
         verify=True
     )
     resp = session.post(
-        '%s/web/database/backup' % host,
+        '{}/web/database/backup'.format(host),
         {'master_pwd': master_pwd, 'name': db, 'backup_format': backup_format},
         stream=True,
         verify=True
@@ -53,11 +91,11 @@ def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', 
 
     now = datetime.datetime.now()
     parsed = urlparse(host)
-    file_name = 'backup-%s-%s-%s.%s' % (
-        parsed.hostname,
-        db,
-        now.strftime('%Y%m%d-%H%M%S'),
-        backup_format
+    file_name = 'backup-{hostname}-{db}-{now}.{ext}'.format(
+        hostname=parsed.hostname,
+        db=db,
+        now=now.strftime('%Y%m%d-%H%M%S'),
+        ext=backup_format
     )
     file_path = os.path.join(backup_dir, file_name)
 
