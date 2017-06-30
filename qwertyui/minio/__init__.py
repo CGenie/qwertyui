@@ -3,10 +3,7 @@ import io
 import os
 import sys
 
-if sys.version_info < (3, 0):
-    from urlparse import urlparse
-else:
-    from urllib.parse import urlparse
+from qwertyui import urlparse
 
 
 def get_minio_client(url, access_key, secret_key, region='eu-central-1', bucket=None):
