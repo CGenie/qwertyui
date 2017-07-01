@@ -52,11 +52,15 @@ def upload_file(client, bucket, file_path, minio_directory, content_type=None, m
             metadata=metadata
         )
 
+    return minio_file_path
+
 
 def upload_directory(client, bucket, directory_path, minio_directory):
     """
     Uploads whole directory structure to minio (recursively).
     """
+
+    file_paths = []
 
     for directory, directories, files in os.walk(directory_path):
         # TODO: can be problematic on Windows but well... I'm too lazy for this
@@ -64,12 +68,15 @@ def upload_directory(client, bucket, directory_path, minio_directory):
         destination_directory = os.path.join(minio_directory, d)
 
         for filename in files:
-            upload_file(
+            minio_file_path = upload_file(
                 client,
                 bucket,
                 os.path.join(directory, filename),
                 destination_directory
             )
+            file_paths.append(minio_file_path)
+
+    return file_paths
 
 
 def size(client, bucket, file_path):
