@@ -153,7 +153,14 @@ def get_content_type(client, bucket, path):
     ).content_type
 
 
-def reserve_temp_dir(client, bucket, root_dir):
+def reserve_temp_dir(client, bucket, root_dir, empty_file_name='_'):
+    """
+    Reserves a temp dir on Minio.
+    Normally, Minio does not have directories, only files.
+    That's why we write an empty file in that reserved directory.
+    You can customize its name by setting the empty_file_name variable.
+    """
+
     while True:
         dir_name = str(uuid.uuid4())
         dir_path = os.path.join(root_dir, dir_name)
@@ -162,7 +169,9 @@ def reserve_temp_dir(client, bucket, root_dir):
             continue
         except StopIteration:
             write_content(
-                os.path.join(dir_path, '0'),
+                client,
+                bucket,
+                os.path.join(dir_path, empty_file_name),
                 ''
             )
             return dir_path
