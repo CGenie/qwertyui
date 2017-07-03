@@ -1,7 +1,9 @@
 import minio
 import io
 import os
-import sys
+import shutil
+import tempfile
+import uuid
 
 from qwertyui import urlparse
 
@@ -32,15 +34,34 @@ def get_minio_client(url, access_key, secret_key, region='eu-central-1', bucket=
     return mc
 
 
-def upload_file(client, bucket, file_path, minio_directory, content_type=None, metadata=None):
+def open(client, bucket, path):
+    return client.get_object(
+        bucket,
+        path
+    )
+
+
+def download_to_tempfile(client, bucket, src):
+    path, ext = os.path.splitext(src)
+
+    temp_file = tempfile.NamedTemporaryFile(suffix=ext)
+    shutil.copyfileobj(temp_file, open(src))
+    temp_file.seek(0)
+
+    return temp_file
+
+
+def upload_file(client,
+                bucket,
+                file_path,
+                minio_file_path,
+                content_type=None,
+                metadata=None):
     """
-    Uploads single file to minio.
+    Uploads single file directly to a minio_path.
     """
 
     size = os.stat(file_path).st_size
-    file_name = os.path.split(file_path)[1]
-    # TODO: can be problematic on Windows but well... I'm too lazy for this
-    minio_file_path = os.path.join(minio_directory, file_name)
 
     with io.open(file_path, 'rb') as f:
         client.put_object(
@@ -53,6 +74,30 @@ def upload_file(client, bucket, file_path, minio_directory, content_type=None, m
         )
 
     return minio_file_path
+
+
+def upload_file_to_minio_directory(client,
+                                   bucket,
+                                   file_path,
+                                   minio_directory,
+                                   content_type=None,
+                                   metadata=None):
+    """
+    Uploads single file to a minio directory.
+    minio_directory path is joined with filename from file_path.
+    """
+
+    file_name = os.path.split(file_path)[1]
+    # TODO: can be problematic on Windows but well... I'm too lazy for this
+    minio_file_path = os.path.join(minio_directory, file_name)
+
+    return upload_file(
+        client,
+        bucket,
+        minio_file_path,
+        content_type=content_type,
+        metadata=metadata
+    )
 
 
 def upload_directory(client, bucket, directory_path, minio_directory):
@@ -68,7 +113,7 @@ def upload_directory(client, bucket, directory_path, minio_directory):
         destination_directory = os.path.join(minio_directory, d)
 
         for filename in files:
-            minio_file_path = upload_file(
+            minio_file_path = upload_file_to_minio_directory(
                 client,
                 bucket,
                 os.path.join(directory, filename),
@@ -79,5 +124,45 @@ def upload_directory(client, bucket, directory_path, minio_directory):
     return file_paths
 
 
+def write_content(client, bucket, path, content):
+    temp_file = tempfile.NamedTemporaryFile()
+    if isinstance(content, str):
+        content = content.encode('utf-8')
+    temp_file.file.write(content)
+    temp_file.file.flush()
+
+    return upload_file(client, bucket, temp_file.name, path)
+
+
 def size(client, bucket, file_path):
     return client.stat_object(bucket, file_path).size
+
+
+def copy(client, bucket, src, dst):
+    client.copy_object(
+        bucket,
+        dst,
+        os.path.join(bucket, src)
+    )
+
+
+def get_content_type(client, bucket, path):
+    return client.stat_object(
+        bucket,
+        path
+    ).content_type
+
+
+def reserve_temp_dir(client, bucket, root_dir):
+    while True:
+        dir_name = str(uuid.uuid4())
+        dir_path = os.path.join(root_dir, dir_name)
+        try:
+            next(client.list_objects(bucket, prefix=dir_path))
+            continue
+        except StopIteration:
+            write_content(
+                os.path.join(dir_path, '0'),
+                ''
+            )
+            return dir_path
