@@ -42,6 +42,32 @@ def exists(client, bucket, path):
     )
 
 
+def listdir(client, bucket, path):
+    # 'recursive' option recurses into the whole tree, we limit only to first level
+    if path and not path.endswith('/'):
+        path = '%s/' % path
+    lst = [
+        obj.object_name.replace(path, '', 1)
+        for obj in client.list_objects(bucket, path, recursive=False)
+    ]
+    directories = set(
+        p.split('/')[0]
+        for p in lst
+        if p.endswith('/')
+        #if os.path.dirname(p)
+    )
+
+    # Tuple of directories, files
+    return (
+        sorted(directories), [
+            p
+            for p in lst
+            if not p.endswith('/')
+            #if not os.path.dirname(p)
+        ]
+    )
+
+
 def open(client, bucket, path):
     return client.get_object(
         bucket,
