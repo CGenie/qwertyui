@@ -34,6 +34,14 @@ def get_minio_client(url, access_key, secret_key, region='eu-central-1', bucket=
     return mc
 
 
+def exists(client, bucket, path):
+    return any(
+        obj
+        for obj in client.list_objects(bucket, path)
+        if obj.object_name.strip(os.path.sep) == path.strip(os.path.sep)
+    )
+
+
 def open(client, bucket, path):
     return client.get_object(
         bucket,
