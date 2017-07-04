@@ -68,6 +68,20 @@ def listdir(client, bucket, path):
     )
 
 
+def remove(client, bucket, path):
+    return client.remove_object(bucket, path)
+
+
+def remove_recursive(client, bucket, path):
+    directories, files = listdir(client, bucket, path)
+
+    for file_name in files:
+        remove(client, bucket, os.path.join(path, file_name))
+
+    for directory in directories:
+        remove_recursive(client, bucket, os.path.join(path, directory))
+
+
 def open(client, bucket, path):
     return client.get_object(
         bucket,
