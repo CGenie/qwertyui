@@ -142,6 +142,7 @@ def upload_file_to_minio_directory(client,
     return upload_file(
         client,
         bucket,
+        file_path,
         minio_file_path,
         content_type=content_type,
         metadata=metadata
