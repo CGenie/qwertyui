@@ -128,3 +128,26 @@ def download_all_backups(host, master_pwd, backup_dir=None, **kwargs):
         )
 
     return backups
+
+
+def upload_backup(host, db, master_pwd, file_content, copy=True, content_type='application/zip'):
+    """
+    Uploads backup to host under new db name 'db'.
+    """
+
+    session = requests.Session()
+
+    resp = session.post(
+        '{}/web/database/restore'.format(host),
+        {
+            'copy': 'true' if copy else 'false',
+            'master_pwd': master_pwd,
+            'name': db,
+        },
+        files={
+            'backup_file': ('backup-file', file_content, content_type),
+        },
+        verify=True
+    )
+
+    return resp
