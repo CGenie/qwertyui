@@ -11,7 +11,7 @@ setup(name='qwertyui',
       url='https://github.com/CGenie/qwertyui',
       packages=find_packages(exclude=['tests.py']),
       install_requires=[
-          'minio==2.2.3',
-          'requests==2.18.1',
+          'minio==2.2.4',
+          'requests==2.18.4',
       ]
 )
