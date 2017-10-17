@@ -6,7 +6,7 @@ import tempfile
 from qwertyui import urlparse
 
 
-def get_odoo_version(host):
+def get_odoo_version(host, **kwargs):
     r = requests.post(
         '{}/jsonrpc'.format(host),
         headers={'Content-Type': 'application/json'},
@@ -19,12 +19,13 @@ def get_odoo_version(host):
                 'service': 'db',
                 'args': {}
             }
-        }
+        },
+        **kwargs
     )
     return r.json()['result']
 
 
-def get_server_version(host):
+def get_server_version(host, **kwargs):
     r = requests.post(
         '{}/jsonrpc'.format(host),
         headers={'Content-Type': 'application/json'},
@@ -37,13 +38,14 @@ def get_server_version(host):
                 'service': 'db',
                 'args': {}
             }
-        }
+        },
+        **kwargs
     )
 
     return r.json()['result']
 
 
-def list_dbs(host):
+def list_dbs(host, **kwargs):
     r = requests.post(
         '{}/jsonrpc'.format(host),
         headers={'Content-Type': 'application/json'},
@@ -56,7 +58,8 @@ def list_dbs(host):
                 'service': 'db',
                 'args': {}
             }
-        }
+        },
+        **kwargs
     )
 
     return r.json()['result']
