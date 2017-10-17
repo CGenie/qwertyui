@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 
 setup(name='qwertyui',
-      version='1.0.13',
+      version='1.0.14',
       description='Some common Python functions and algorithms',
       author='Przemyslaw Kaminski',
       author_email='cgenie@gmail.com',
