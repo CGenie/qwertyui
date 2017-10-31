@@ -1,6 +1,7 @@
 import datetime
 import os
 import requests
+from requests_toolbelt.multipart_encoder import MultipartEncoder
 import tempfile
 
 from qwertyui import urlparse
@@ -140,17 +141,18 @@ def upload_backup(host, db, master_pwd, file_content, copy=True, content_type='a
 
     session = requests.Session()
 
+    m = MultipartEncoder({
+        'copy': 'true' if copy else 'false',
+        'master_pwd': master_pwd,
+        'name': db,
+        'backup_file': ('backup-file', file_content, content_type),
+    })
+
     resp = session.post(
         '{}/web/database/restore'.format(host),
-        {
-            'copy': 'true' if copy else 'false',
-            'master_pwd': master_pwd,
-            'name': db,
-        },
-        files={
-            'backup_file': ('backup-file', file_content, content_type),
-        },
-        verify=True
+        data=m,
+        verify=True,
+        headers={'Content-Type': m.content_type}
     )
 
     return resp
