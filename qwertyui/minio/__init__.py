@@ -93,7 +93,7 @@ def download_to_tempfile(client, bucket, src):
     path, ext = os.path.splitext(src)
 
     temp_file = tempfile.NamedTemporaryFile(suffix=ext)
-    shutil.copyfileobj(temp_file, open(src))
+    shutil.copyfileobj(open(client, bucket, src), temp_file)
     temp_file.seek(0)
 
     return temp_file
