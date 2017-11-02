@@ -3,6 +3,7 @@ import os
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import tempfile
+import zipfile
 
 from qwertyui import urlparse
 
@@ -91,7 +92,7 @@ def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', 
         verify=True
     )
     if 'application/octet-stream' not in resp.headers['Content-Type']:
-        raise Exception('Content-type is not application/octet-stream, no zipfile received!')
+        raise ValueError('Content-type is not application/octet-stream, no zipfile received!')
 
     now = datetime.datetime.now()
     parsed = urlparse(host)
@@ -108,6 +109,9 @@ def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', 
         for chunk in resp.iter_content(chunk_size):
             f.write(chunk)
             size += len(chunk)
+
+    if backup_format == 'zip' and not zipfile.is_zipfile(file_path):
+        raise ValueError('Backup downloaded to %s but this is not a valid zipfile!' % file_path)
 
     return file_path, size
 
