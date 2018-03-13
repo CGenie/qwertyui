@@ -1,5 +1,4 @@
 import datetime
-import math
 import re
 
 
@@ -43,11 +42,9 @@ class PeriodicBackupRemover:
     """
 
     def __init__(self,
-                 backup_file_name_re=r'backup-(.*)-(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2}).zip',
-                 host_db_re=r'(.+\..+\.\w+)-(.+)'):
+                 date_re=r'(.*)-(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})(\d{2})\.(.*)'):
         self.rules = []
-        self.backup_file_name_re = re.compile(backup_file_name_re)
-        self.host_db_re = re.compile(host_db_re)
+        self.date_re = re.compile(date_re)
 
     @staticmethod
     def parse_date_format(num, unit):
@@ -148,18 +145,19 @@ class PeriodicBackupRemover:
 
     def parse_backup_file_name(self, file_name):
         try:
-            match = self.backup_file_name_re.match(file_name).groups()
+            match = self.date_re.match(file_name).groups()
         except AttributeError:
             return
 
-        host_db = match[0]
-        host, db = self.host_db_re.match(host_db).groups()
+        dates = match[1:-1]
+        name = match[0]
+        ext = match[-1]
 
         return {
-            'date': datetime.datetime(*map(int, match[1:])),
-            'db': db,
-            'host': host,
+            'date': datetime.datetime(*map(int, dates)),
+            'ext': ext,
             'file_name': file_name,
+            'name': name,
         }
 
     def keep_backup(self, kept_backups, backup):
@@ -182,7 +180,7 @@ class PeriodicBackupRemover:
             if backup is None:
                 unknown_file_names.append(file_name)
                 continue
-            key = (backup['host'], backup['db'])
+            key = (backup['name'], backup['ext'])
             backups.setdefault(key, [])
             remove_backups.setdefault(key, [])
 

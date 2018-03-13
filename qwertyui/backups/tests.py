@@ -57,9 +57,9 @@ class PeriodicBackupRemoverTest(unittest.TestCase):
             self.remover.parse_backup_file_name(file_names[0]),
             {
                 'date': datetime.datetime(2017, 1, 14, 6, 6, 53),
-                'db': 'db1',
-                'host': 'host1.example.com',
+                'ext': 'zip',
                 'file_name': file_names[0],
+                'name': 'backup-host1.example.com-db1',
             }
         )
 
