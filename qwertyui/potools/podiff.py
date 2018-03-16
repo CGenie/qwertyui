@@ -1,6 +1,9 @@
 # -*- coding: UTF-8 -*-
+"""
+This tool creates po file of entries that translations doesn't match or are new
+"""
 from optparse import OptionParser
-import polib
+from polib_parser_fix import polib
 import re
 import sys
 
@@ -17,7 +20,8 @@ def diff(filepath1, filepath2):
     file1 = polib.pofile(filepath1)
     file2 = polib.pofile(filepath2)
     diff_po = polib.POFile()
-    diff_po.metadata = file2.metadata
+    if file2.metadata:
+        diff_po.metadata = file2.metadata
 
     for entry_file2 in file2:
         entry_file1 = file1.find(entry_file2.msgid,
