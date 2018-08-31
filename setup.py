@@ -4,15 +4,15 @@ from setuptools import find_packages, setup
 
 
 setup(name='qwertyui',
-      version='1.0.21',
+      version='1.0.22',
       description='Some common Python functions and algorithms',
       author='Przemyslaw Kaminski',
       author_email='cgenie@gmail.com',
       url='https://github.com/CGenie/qwertyui',
       packages=find_packages(exclude=['tests.py']),
       install_requires=[
-          'minio==2.2.4',
-          'requests==2.18.4',
+          'minio==4.0.3',
+          'requests==2.19.1',
           'requests-toolbelt==0.8.0',
       ]
 )
