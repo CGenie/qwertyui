@@ -50,7 +50,7 @@ def get_server_version(host, **kwargs):
         **kwargs
     )
 
-    return get_jsonrpc_result(j.json())
+    return get_jsonrpc_result(r.json())
 
 
 def list_dbs(host, **kwargs):
@@ -70,7 +70,7 @@ def list_dbs(host, **kwargs):
         **kwargs
     )
 
-    return get_jsonrpc_result(j.json())
+    return get_jsonrpc_result(r.json())
 
 
 def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', chunk_size=16384):
