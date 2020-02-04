@@ -7,6 +7,7 @@ stdenv.mkDerivation rec {
   };
   buildInputs = [
     python3Packages.ipython
+    python3Packages.twine
   ];
   builder = builtins.toFile "builder.sh" ''
     source $stdenv/setup
