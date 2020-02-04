@@ -8,6 +8,12 @@ import zipfile
 from qwertyui import urlparse
 
 
+def get_jsonrpc_result(j):
+    if 'error' in j:
+        raise Exception(j['error'])
+    return j['result']
+
+
 def get_odoo_version(host, **kwargs):
     r = requests.post(
         '{}/jsonrpc'.format(host),
@@ -24,7 +30,7 @@ def get_odoo_version(host, **kwargs):
         },
         **kwargs
     )
-    return r.json()['result']
+    return get_jsonrpc_result(r.json())
 
 
 def get_server_version(host, **kwargs):
@@ -44,7 +50,7 @@ def get_server_version(host, **kwargs):
         **kwargs
     )
 
-    return r.json()['result']
+    return get_jsonrpc_result(j.json())
 
 
 def list_dbs(host, **kwargs):
@@ -64,7 +70,7 @@ def list_dbs(host, **kwargs):
         **kwargs
     )
 
-    return r.json()['result']
+    return get_jsonrpc_result(j.json())
 
 
 def download_backup(host, db, master_pwd, backup_dir=None, backup_format='zip', chunk_size=16384):
