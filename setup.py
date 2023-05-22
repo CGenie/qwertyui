@@ -12,7 +12,7 @@ setup(name='qwertyui',
       packages=find_packages(exclude=['tests.py']),
       install_requires=[
           'minio==4.0.3',
-          'requests==2.20.0',
+          'requests==2.31.0',
           'requests-toolbelt==0.8.0',
       ]
 )
